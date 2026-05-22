@@ -1,15 +1,6 @@
 import React, { useEffect } from "react";
-import {
-  ArrowRight,
-  Building2,
-  Mail,
-  MapPin,
-  Menu,
-  Phone,
-  X,
-} from "lucide-react";
+import { ArrowRight, Building2, Mail, MapPin, Menu, Phone, X } from "lucide-react";
 
-const GOLD = "#beaf87";
 const LOGO = "/assets/logosite.png";
 const PAULO_PHOTO = "/assets/paulo-matos.png";
 const MARIA_PHOTO = "/assets/maria-carreiro.png";
@@ -33,12 +24,22 @@ const consultants = [
   },
 ];
 
+function BrandLogo() {
+  return (
+    <div className="flex flex-col items-center gap-0.5">
+      <img src={LOGO} alt="CENTURY 21" className="h-11 w-auto object-contain sm:h-12" />
+      <span className="pl-[0.34em] text-[0.62rem] font-semibold uppercase tracking-[0.34em] text-[#beaf87]">
+        Nações
+      </span>
+    </div>
+  );
+}
+
 export default function ClienteHomeCentury21() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   useEffect(() => {
     const scriptId = "ghl-form-embed-script";
-
     if (!document.getElementById(scriptId)) {
       const script = document.createElement("script");
       script.id = scriptId;
@@ -49,15 +50,21 @@ export default function ClienteHomeCentury21() {
   }, []);
 
   const navItems = [
-    { label: "Sobre Nós", href: "#home" },
-    { label: "Apoio Jurídico", href: "#home" },
-    { label: "Crédito Habitação", href: "#home" },
-    { label: "Contacte-nos", href: "#contacte-nos" },
+    { label: "Sobre Nós", href: "#home", section: true },
+    { label: "Apoio Jurídico", href: "#home", section: true },
+    { label: "Crédito Habitação", href: "/credito-habitacao", section: false },
+    { label: "Contacte-nos", href: "#contacte-nos", section: true },
   ];
 
-  function handleScroll(event, href) {
+  function handleNavClick(event, item) {
+    setMobileMenuOpen(false);
+
+    if (!item.section) {
+      return;
+    }
+
     event.preventDefault();
-    const target = document.querySelector(href);
+    const target = document.querySelector(item.href);
     target?.scrollIntoView({ behavior: "smooth" });
   }
 
@@ -65,8 +72,8 @@ export default function ClienteHomeCentury21() {
     <main className="min-h-screen bg-white text-[#171717]">
       <header className="fixed left-0 top-0 z-50 w-full border-b border-[#beaf87]/25 bg-white/90 backdrop-blur-xl">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
-          <a href="#home" className="flex items-center gap-3" aria-label="Ir para o início">
-            <img src={LOGO} alt="CENTURY 21" className="h-12 w-auto object-contain" />
+          <a href="/" aria-label="Ir para a página inicial">
+            <BrandLogo />
           </a>
 
           <nav className="hidden items-center gap-8 lg:flex">
@@ -74,7 +81,7 @@ export default function ClienteHomeCentury21() {
               <a
                 key={item.label}
                 href={item.href}
-                onClick={(event) => handleScroll(event, item.href)}
+                onClick={(event) => handleNavClick(event, item)}
                 className="text-sm font-semibold uppercase tracking-[0.16em] text-[#171717]/70 transition hover:text-[#beaf87]"
               >
                 {item.label}
@@ -86,7 +93,7 @@ export default function ClienteHomeCentury21() {
             type="button"
             onClick={() => setMobileMenuOpen((current) => !current)}
             className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#beaf87]/35 text-[#beaf87] lg:hidden"
-            aria-label="Abrir menu"
+            aria-label={mobileMenuOpen ? "Fechar menu" : "Abrir menu"}
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -99,10 +106,7 @@ export default function ClienteHomeCentury21() {
                 <a
                   key={item.label}
                   href={item.href}
-                  onClick={(event) => {
-                    handleScroll(event, item.href);
-                    setMobileMenuOpen(false);
-                  }}
+                  onClick={(event) => handleNavClick(event, item)}
                   className="rounded-2xl border border-[#beaf87]/25 bg-[#fbfaf7] px-4 py-3 text-sm font-semibold uppercase tracking-[0.16em] text-[#171717]/78"
                 >
                   {item.label}
@@ -154,7 +158,6 @@ export default function ClienteHomeCentury21() {
                 Falar com Paulo
                 <ArrowRight className="ml-3 h-5 w-5" />
               </a>
-
               <a
                 href="https://wa.me/351937219215"
                 target="_blank"
@@ -180,19 +183,11 @@ export default function ClienteHomeCentury21() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/78 via-black/18 to-transparent" />
                   <div className="absolute bottom-0 left-0 right-0 p-6 lg:p-8">
-                    <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#beaf87]">
-                      {consultant.role}
-                    </p>
+                    <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#beaf87]">{consultant.role}</p>
                     <h2 className="mt-2 font-serif text-4xl text-white lg:text-[2.9rem] xl:text-[3.15rem]">{consultant.name}</h2>
                     <div className="mt-5 space-y-3 text-sm text-white/86">
-                      <p className="flex items-center gap-3">
-                        <Phone className="h-4 w-4 shrink-0 text-[#beaf87]" />
-                        <span>Tlm: {consultant.phone}</span>
-                      </p>
-                      <p className="flex items-center gap-3">
-                        <Mail className="h-4 w-4 shrink-0 text-[#beaf87]" />
-                        <span>{consultant.email}</span>
-                      </p>
+                      <p className="flex items-center gap-3"><Phone className="h-4 w-4 shrink-0 text-[#beaf87]" /><span>Tlm: {consultant.phone}</span></p>
+                      <p className="flex items-center gap-3"><Mail className="h-4 w-4 shrink-0 text-[#beaf87]" /><span>{consultant.email}</span></p>
                     </div>
                   </div>
                 </div>
@@ -204,26 +199,17 @@ export default function ClienteHomeCentury21() {
 
       <section id="imoveis" className="border-t border-[#beaf87]/20 bg-[#fbfaf7] px-5 py-20 sm:px-8 lg:px-10">
         <div className="mx-auto max-w-7xl">
-          <div className="mb-12 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
-            <div>
-              <p className="mb-4 text-xs font-bold uppercase tracking-[0.38em] text-[#beaf87]">
-                Imóveis disponíveis
-              </p>
-              <h2 className="font-serif text-4xl leading-tight text-[#2a2418] sm:text-5xl">
-                Esta secção está em desenvolvimento.
-              </h2>
-              <p className="mt-5 max-w-2xl text-base leading-8 text-[#171717]/68">
-                Em breve, poderá consultar aqui os imóveis disponíveis para compra, com fotografias, localização, características e contacto direto com a equipa.
-              </p>
-            </div>
+          <div className="mb-12">
+            <p className="mb-4 text-xs font-bold uppercase tracking-[0.38em] text-[#beaf87]">Imóveis disponíveis</p>
+            <h2 className="font-serif text-4xl leading-tight text-[#2a2418] sm:text-5xl">Esta secção está em desenvolvimento.</h2>
+            <p className="mt-5 max-w-2xl text-base leading-8 text-[#171717]/68">
+              Em breve, poderá consultar aqui os imóveis disponíveis para compra, com fotografias, localização, características e contacto direto com a equipa.
+            </p>
           </div>
 
           <div className="grid gap-5 md:grid-cols-3">
             {["Imóvel em breve", "Novas oportunidades", "Catálogo em construção"].map((title) => (
-              <article
-                key={title}
-                className="rounded-[2rem] border border-[#beaf87]/25 bg-white p-7 shadow-[0_24px_70px_rgba(40,32,20,0.08)]"
-              >
+              <article key={title} className="rounded-[2rem] border border-[#beaf87]/25 bg-white p-7 shadow-[0_24px_70px_rgba(40,32,20,0.08)]">
                 <div className="mb-6 flex h-44 items-center justify-center rounded-[1.5rem] border border-[#beaf87]/20 bg-[#fbfaf7]">
                   <Building2 className="h-10 w-10 text-[#beaf87]" />
                 </div>
@@ -275,7 +261,10 @@ export default function ClienteHomeCentury21() {
       <footer className="border-t border-[#beaf87]/20 bg-[#fbfaf7] px-5 py-12 sm:px-8 lg:px-10">
         <div className="mx-auto grid max-w-7xl gap-10 text-center lg:grid-cols-[1fr_1.2fr_0.8fr] lg:text-left">
           <div>
-            <img src={LOGO} alt="CENTURY 21" className="mx-auto mb-6 h-14 w-auto object-contain lg:mx-0" />
+            <div className="mb-6 flex flex-col items-center gap-1 lg:items-start">
+              <img src={LOGO} alt="CENTURY 21" className="h-14 w-auto object-contain" />
+              <span className="text-xs font-semibold uppercase tracking-[0.38em] text-[#beaf87]">Nações</span>
+            </div>
             <h3 className="font-serif text-3xl text-[#2a2418]">Paulo Matos</h3>
             <p className="mt-1 text-[#171717]/68">Consultor Imobiliário</p>
             <p className="mt-5 text-lg font-bold text-[#171717]">CENTURY 21.</p>
@@ -290,12 +279,8 @@ export default function ClienteHomeCentury21() {
           </div>
 
           <div className="flex flex-col items-center gap-4 text-sm text-[#171717]/68 lg:items-end">
-            <a href="/politica-de-privacidade" className="transition hover:text-[#beaf87]">
-              Política de Privacidade
-            </a>
-            <a href="/politica-de-cookies" className="transition hover:text-[#beaf87]">
-              Política de Cookies
-            </a>
+            <a href="/politica-de-privacidade" className="transition hover:text-[#beaf87]">Política de Privacidade</a>
+            <a href="/politica-de-cookies" className="transition hover:text-[#beaf87]">Política de Cookies</a>
           </div>
         </div>
 
