@@ -36,7 +36,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 const ADMIN_MENU = [
   { id: "imoveis", label: "Gestão de Imóveis", icon: Building2 },
-  { id: "posts", label: "Gestão de Posts", icon: FileText },
+  { id: "posts", label: "Gestão de Posts", icon: FileText,path: "/admin/posts", },
   { id: "usuarios", label: "Gestão de Usuários", icon: Users },
 ];
 
@@ -59,7 +59,12 @@ export default function PainelAdminCentury21() {
   const [checkingSession, setCheckingSession] = useState(true);
   const [loggedUserEmail, setLoggedUserEmail] = useState("");
 
-  const [activeSection, setActiveSection] = useState("imoveis");
+  const sectionFromUrl =
+  new URLSearchParams(window.location.search).get("secao") === "usuarios"
+    ? "usuarios"
+    : "imoveis";
+
+const [activeSection, setActiveSection] = useState(sectionFromUrl);
   const [adminMenuOpen, setAdminMenuOpen] = useState(false);
 
   const [newUserEmail, setNewUserEmail] = useState("");
@@ -107,12 +112,19 @@ export default function PainelAdminCentury21() {
     };
   }, []);
 
-  function handleSectionChange(sectionId) {
-    setActiveSection(sectionId);
-    setAdminMenuOpen(false);
-    setCreationError("");
-    setCreationSuccess("");
+  function handleSectionChange(item) {
+  setAdminMenuOpen(false);
+  setCreationError("");
+  setCreationSuccess("");
+
+  if (item.id === "posts") {
+    window.location.href = item.path;
+    return;
   }
+
+  window.history.replaceState({}, "", item.path);
+  setActiveSection(item.id);
+}
 
   async function handleCreateUser(event) {
     event.preventDefault();
@@ -278,7 +290,7 @@ export default function PainelAdminCentury21() {
                 <button
                   key={item.id}
                   type="button"
-                  onClick={() => handleSectionChange(item.id)}
+                  onClick={() => handleSectionChange(item)}
                   className={`flex w-full items-center rounded-2xl border px-4 py-4 text-left text-sm font-semibold transition ${
                     isActive
                       ? "border-[#beaf87]/30 bg-[#beaf87]/12 text-[#beaf87]"
