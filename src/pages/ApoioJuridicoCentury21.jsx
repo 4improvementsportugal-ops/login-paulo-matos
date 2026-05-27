@@ -742,14 +742,9 @@ function PublicFooter() {
         </div>
 
         <div className="flex flex-col items-center gap-4 text-sm text-[#171717]/68 lg:items-end">
-          <a href="/politica-de-privacidade" className="transition hover:text-[#beaf87]">
-            Política de Privacidade
-          </a>
-          <a href="/politica-de-cookies" className="transition hover:text-[#beaf87]">
-            Política de Cookies
-          </a>
+            <a href="/politica-de-privacidade-e-cookies" className="transition hover:text-[#beaf87]">Política de Privacidade e Cookies</a>
+          </div>
         </div>
-      </div>
 
       <div className="mx-auto mt-10 max-w-7xl border-t border-[#beaf87]/20 pt-6 text-center text-xs leading-6 text-[#171717]/46">
         <p>Cada agência é jurídica e financeiramente independente.</p>

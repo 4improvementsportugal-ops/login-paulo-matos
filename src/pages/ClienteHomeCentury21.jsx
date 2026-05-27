@@ -279,8 +279,7 @@ export default function ClienteHomeCentury21() {
           </div>
 
           <div className="flex flex-col items-center gap-4 text-sm text-[#171717]/68 lg:items-end">
-            <a href="/politica-de-privacidade" className="transition hover:text-[#beaf87]">Política de Privacidade</a>
-            <a href="/politica-de-cookies" className="transition hover:text-[#beaf87]">Política de Cookies</a>
+            <a href="/politica-de-privacidade-e-cookies" className="transition hover:text-[#beaf87]">Política de Privacidade e Cookies</a>
           </div>
         </div>
 

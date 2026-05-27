@@ -5,6 +5,7 @@ import Century21Login from "./pages/Login";
 import PainelAdminCentury21 from "./pages/PainelAdminCentury21";
 import GestaoPostsCentury21 from "./pages/GestaoPostsCentury21";
 import ApoioJuridicoCentury21 from "./pages/ApoioJuridicoCentury21";
+import PoliticaPrivacidadeCookiesCentury21 from "./pages/PoliticaPrivacidadeCookiesCentury21";
 
 function App() {
   return (
@@ -37,7 +38,15 @@ function App() {
         path="/admin/posts"
         element={<GestaoPostsCentury21 />}
       />
+
+      <Route
+  path="/politica-de-privacidade-e-cookies"
+  element={<PoliticaPrivacidadeCookiesCentury21 />}
+/>
     </Routes>
+
+
+    
   );
 }
 
