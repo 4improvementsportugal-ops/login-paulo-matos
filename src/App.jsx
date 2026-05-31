@@ -8,6 +8,8 @@ import ApoioJuridicoCentury21 from "./pages/ApoioJuridicoCentury21";
 import PoliticaPrivacidadeCookiesCentury21 from "./pages/PoliticaPrivacidadeCookiesCentury21";
 import ContacteNosCentury21 from "./pages/ContacteNosCentury21";
 import SobreNosCentury21 from "./pages/SobreNosCentury21";
+import GestaoImoveisCentury21 from "./pages/GestaoImoveisCentury21";
+import ImovelIndividualCentury21 from "./pages/ImovelIndividualCentury21";
 
 function App() {
   return (
@@ -53,6 +55,15 @@ function App() {
 <Route
   path="/sobre-nos"
   element={<SobreNosCentury21 />}
+/>
+
+<Route
+  path="/admin/imoveis"
+  element={<GestaoImoveisCentury21 />}
+/>
+<Route
+  path="/imoveis/:slug"
+  element={<ImovelIndividualCentury21 />}
 />
     </Routes>
 

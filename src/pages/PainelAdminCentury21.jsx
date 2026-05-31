@@ -35,9 +35,9 @@ const SUPABASE_PUBLISHABLE_KEY =
 const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 const ADMIN_MENU = [
-  { id: "imoveis", label: "Gestão de Imóveis", icon: Building2 },
+  { id: "imoveis", label: "Gestão de Imóveis", icon: Building2,path: "/admin/imoveis" },
   { id: "posts", label: "Gestão de Posts", icon: FileText,path: "/admin/posts", },
-  { id: "usuarios", label: "Gestão de Usuários", icon: Users },
+  { id: "usuarios", label: "Gestão de Usuários", icon: Users,path: "/admin/usuarios" },
 ];
 
 function BrandLogo() {

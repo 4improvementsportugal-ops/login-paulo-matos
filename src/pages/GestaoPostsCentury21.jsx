@@ -80,7 +80,7 @@ const ADMIN_MENU = [
     id: "imoveis",
     label: "Gestão de Imóveis",
     icon: Building2,
-    path: "/admin/painel",
+    path: "/admin/imoveis",
   },
   {
     id: "posts",

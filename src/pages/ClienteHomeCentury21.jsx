@@ -1,9 +1,47 @@
-import React, { useEffect } from "react";
-import { ArrowRight, Building2, Mail, MapPin, Menu, Phone, X } from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
+import { createClient } from "@supabase/supabase-js";
+import {
+  ArrowRight,
+  Bath,
+  BedDouble,
+  Building2,
+  ExternalLink,
+  Loader2,
+  Mail,
+  MapPin,
+  Menu,
+  Phone,
+  Ruler,
+  X,
+} from "lucide-react";
 
+const ENV = import.meta.env || {};
+const GOLD = "#beaf87";
 const LOGO = "/assets/logosite.png";
 const PAULO_PHOTO = "/assets/paulo-matos.png";
 const MARIA_PHOTO = "/assets/maria-carreiro.png";
+
+const DEFAULT_SUPABASE_URL = "https://keulsgyzfruvscapcuxk.supabase.co";
+const DEFAULT_SUPABASE_KEY = "sb_publishable_Rg-J0l6M1cGxvNdIupJwrg_Y7GWhrFK";
+
+const MARIA_PROPERTIES_URL =
+  "https://mjcarreiro.century21.pt/comprar?address_names=Lisboa&addresses=1106&page=1&ad_type=sell";
+
+const PAULO_PROPERTIES_URL =
+  "https://pjmatos.century21.pt/comprar?agent_handler=pjmatos";
+
+function normalizeSupabaseUrl(url) {
+  return url.replace(/\/rest\/v1\/?$/, "");
+}
+
+const SUPABASE_URL = normalizeSupabaseUrl(
+  ENV.VITE_SUPABASE_URL || DEFAULT_SUPABASE_URL
+);
+
+const SUPABASE_PUBLISHABLE_KEY =
+  ENV.VITE_SUPABASE_PUBLISHABLE_KEY || DEFAULT_SUPABASE_KEY;
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 const consultants = [
   {
@@ -24,6 +62,40 @@ const consultants = [
   },
 ];
 
+function formatCurrency(value) {
+  const number = Number(String(value || "").replace(/[^0-9.]/g, ""));
+
+  if (!number) {
+    return "Preço sob consulta";
+  }
+
+  return new Intl.NumberFormat("pt-PT", {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 0,
+  }).format(number);
+}
+
+function getPropertyCover(property) {
+  if (property.cover_photo_url) {
+    return property.cover_photo_url;
+  }
+
+  if (Array.isArray(property.photos) && property.photos[0]?.url) {
+    return property.photos[0].url;
+  }
+
+  return "";
+}
+
+function getConsultantName(value) {
+  if (value === "maria") {
+    return "Maria Carreiro";
+  }
+
+  return "Paulo Matos";
+}
+
 function BrandLogo() {
   return (
     <div className="flex flex-col items-center gap-0.5">
@@ -35,11 +107,95 @@ function BrandLogo() {
   );
 }
 
+function PropertyCard({ property }) {
+  const cover = getPropertyCover(property);
+  const detailUrl = property.slug ? `/imoveis/${property.slug}` : "/#imoveis";
+
+  return (
+    <article className="group flex h-full flex-col overflow-hidden rounded-[2rem] border border-[#beaf87]/24 bg-white shadow-[0_18px_54px_rgba(40,32,20,0.07)] transition hover:-translate-y-1 hover:shadow-[0_28px_68px_rgba(40,32,20,0.12)]">
+      <a href={detailUrl} className="block overflow-hidden">
+        {cover ? (
+          <img
+            src={cover}
+            alt={property.title}
+            className="h-56 w-full object-cover transition duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex h-56 items-center justify-center bg-[#fbfaf7]">
+            <Building2 className="h-10 w-10 text-[#beaf87]/70" />
+          </div>
+        )}
+      </a>
+
+      <div className="flex flex-1 flex-col p-5">
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <span className="rounded-full border border-[#beaf87]/25 bg-[#fbfaf7] px-3 py-1.5 text-[0.62rem] font-bold uppercase tracking-[0.16em] text-[#947e4d]">
+            {property.property_type || "Imóvel"}
+          </span>
+
+          <span className="text-xs text-[#171717]/48">
+            {getConsultantName(property.consultant)}
+          </span>
+        </div>
+
+        <h3 className="font-serif text-2xl leading-tight text-[#2a2418]">
+          {property.title}
+        </h3>
+
+        <p className="mt-3 flex items-center gap-2 text-sm text-[#171717]/54">
+          <MapPin className="h-4 w-4 shrink-0 text-[#beaf87]" />
+          <span className="truncate">
+            {[property.parish, property.city].filter(Boolean).join(", ") || "Lisboa"}
+          </span>
+        </p>
+
+        <p className="mt-4 font-serif text-2xl text-[#947e4d]">
+          {formatCurrency(property.price)}
+        </p>
+
+        <div className="mt-5 grid grid-cols-3 gap-2 border-y border-[#beaf87]/16 py-4 text-xs text-[#171717]/58">
+          <span className="flex items-center gap-1.5">
+            <Ruler className="h-3.5 w-3.5 text-[#beaf87]" />
+            {property.area ? `${property.area} m²` : "—"}
+          </span>
+
+          <span className="flex items-center gap-1.5">
+            <BedDouble className="h-3.5 w-3.5 text-[#beaf87]" />
+            {property.bedrooms ?? "—"}
+          </span>
+
+          <span className="flex items-center gap-1.5">
+            <Bath className="h-3.5 w-3.5 text-[#beaf87]" />
+            {property.bathrooms ?? "—"}
+          </span>
+        </div>
+
+        <p className="mt-4 flex-1 text-sm leading-7 text-[#171717]/62">
+          {property.short_description ||
+            "Imóvel disponível para consulta. Fale com a equipa para mais informações."}
+        </p>
+
+        <a
+          href={detailUrl}
+          className="mt-6 inline-flex items-center text-xs font-extrabold uppercase tracking-[0.17em] text-[#947e4d]"
+        >
+          Ver imóvel
+          <ArrowRight className="ml-2 h-4 w-4 transition group-hover:translate-x-1" />
+        </a>
+      </div>
+    </article>
+  );
+}
+
 export default function ClienteHomeCentury21() {
-  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [availableProperties, setAvailableProperties] = useState([]);
+  const [propertiesLoading, setPropertiesLoading] = useState(true);
+  const [propertiesError, setPropertiesError] = useState("");
 
   useEffect(() => {
     const scriptId = "ghl-form-embed-script";
+
     if (!document.getElementById(scriptId)) {
       const script = document.createElement("script");
       script.id = scriptId;
@@ -49,22 +205,56 @@ export default function ClienteHomeCentury21() {
     }
   }, []);
 
+  useEffect(() => {
+    async function loadAvailableProperties() {
+      setPropertiesLoading(true);
+      setPropertiesError("");
+
+      const { data, error } = await supabase
+        .from("properties")
+        .select(
+          "id,title,slug,status,consultant,transaction_type,property_type,price,area,bedrooms,bathrooms,parish,city,short_description,photos,cover_photo_url,created_at,updated_at"
+        )
+        .eq("status", "publicado")
+        .order("updated_at", { ascending: false })
+        .limit(8);
+
+      if (error) {
+        console.error("Erro ao carregar imóveis disponíveis:", error);
+        setAvailableProperties([]);
+        setPropertiesError(
+          "Não foi possível carregar os imóveis disponíveis neste momento."
+        );
+      } else {
+        setAvailableProperties(data || []);
+      }
+
+      setPropertiesLoading(false);
+    }
+
+    loadAvailableProperties();
+  }, []);
+
+  const propertySlots = useMemo(() => {
+    return availableProperties.slice(0, 8);
+  }, [availableProperties]);
+
   const navItems = [
-    { label: "Sobre Nós", href: "/sobre-nos", section: true },
-    { label: "Apoio Jurídico", href: "/apoio-juridico", section: false },
-    { label: "Crédito Habitação", href: "/credito-habitacao", section: false },
-    { label: "Contacte-nos", href: "contacte-nos", section: true },
+    { label: "Sobre Nós", href: "/sobre-nos" },
+    { label: "Apoio Jurídico", href: "/apoio-juridico" },
+    { label: "Crédito Habitação", href: "/credito-habitacao" },
+    { label: "Contacte-nos", href: "/contacte-nos" },
   ];
 
-  function handleNavClick(event, item) {
+  function handleNavigation(event, href) {
     setMobileMenuOpen(false);
 
-    if (!item.section) {
+    if (!href.startsWith("#")) {
       return;
     }
 
     event.preventDefault();
-    const target = document.querySelector(item.href);
+    const target = document.querySelector(href);
     target?.scrollIntoView({ behavior: "smooth" });
   }
 
@@ -81,7 +271,7 @@ export default function ClienteHomeCentury21() {
               <a
                 key={item.label}
                 href={item.href}
-                onClick={(event) => handleNavClick(event, item)}
+                onClick={(event) => handleNavigation(event, item.href)}
                 className="text-sm font-semibold uppercase tracking-[0.16em] text-[#171717]/70 transition hover:text-[#beaf87]"
               >
                 {item.label}
@@ -106,7 +296,7 @@ export default function ClienteHomeCentury21() {
                 <a
                   key={item.label}
                   href={item.href}
-                  onClick={(event) => handleNavClick(event, item)}
+                  onClick={(event) => handleNavigation(event, item.href)}
                   className="rounded-2xl border border-[#beaf87]/25 bg-[#fbfaf7] px-4 py-3 text-sm font-semibold uppercase tracking-[0.16em] text-[#171717]/78"
                 >
                   {item.label}
@@ -158,6 +348,7 @@ export default function ClienteHomeCentury21() {
                 Falar com Paulo
                 <ArrowRight className="ml-3 h-5 w-5" />
               </a>
+
               <a
                 href="https://wa.me/351937219215"
                 target="_blank"
@@ -183,11 +374,21 @@ export default function ClienteHomeCentury21() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/78 via-black/18 to-transparent" />
                   <div className="absolute bottom-0 left-0 right-0 p-6 lg:p-8">
-                    <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#beaf87]">{consultant.role}</p>
-                    <h2 className="mt-2 font-serif text-4xl text-white lg:text-[2.9rem] xl:text-[3.15rem]">{consultant.name}</h2>
+                    <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#beaf87]">
+                      {consultant.role}
+                    </p>
+                    <h2 className="mt-2 font-serif text-4xl text-white lg:text-[2.9rem] xl:text-[3.15rem]">
+                      {consultant.name}
+                    </h2>
                     <div className="mt-5 space-y-3 text-sm text-white/86">
-                      <p className="flex items-center gap-3"><Phone className="h-4 w-4 shrink-0 text-[#beaf87]" /><span>Tlm: {consultant.phone}</span></p>
-                      <p className="flex items-center gap-3"><Mail className="h-4 w-4 shrink-0 text-[#beaf87]" /><span>{consultant.email}</span></p>
+                      <p className="flex items-center gap-3">
+                        <Phone className="h-4 w-4 shrink-0 text-[#beaf87]" />
+                        <span>Tlm: {consultant.phone}</span>
+                      </p>
+                      <p className="flex items-center gap-3">
+                        <Mail className="h-4 w-4 shrink-0 text-[#beaf87]" />
+                        <span>{consultant.email}</span>
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -199,27 +400,70 @@ export default function ClienteHomeCentury21() {
 
       <section id="imoveis" className="border-t border-[#beaf87]/20 bg-[#fbfaf7] px-5 py-20 sm:px-8 lg:px-10">
         <div className="mx-auto max-w-7xl">
-          <div className="mb-12">
-            <p className="mb-4 text-xs font-bold uppercase tracking-[0.38em] text-[#beaf87]">Imóveis disponíveis</p>
-            <h2 className="font-serif text-4xl leading-tight text-[#2a2418] sm:text-5xl">Esta secção está em desenvolvimento.</h2>
-            <p className="mt-5 max-w-2xl text-base leading-8 text-[#171717]/68">
-              Em breve, poderá consultar aqui os imóveis disponíveis para compra, com fotografias, localização, características e contacto direto com a equipa.
-            </p>
+          <div className="mb-12 flex flex-col justify-between gap-7 lg:flex-row lg:items-end">
+            <div>
+              <p className="mb-4 text-xs font-bold uppercase tracking-[0.38em] text-[#beaf87]">
+                Imóveis disponíveis
+              </p>
+              <h2 className="font-serif text-4xl leading-tight text-[#2a2418] sm:text-5xl">
+                Oportunidades em destaque
+              </h2>
+              <p className="mt-5 max-w-2xl text-base leading-8 text-[#171717]/68">
+                Consulte os imóveis atualmente publicados pela equipa e aceda diretamente ao catálogo completo de cada consultor.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-3 sm:flex-row lg:justify-end">
+              <a
+                href={MARIA_PROPERTIES_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-14 items-center justify-center rounded-2xl border border-[#beaf87]/45 bg-white px-6 py-4 text-center text-xs font-extrabold uppercase tracking-[0.14em] text-[#2a2418] transition hover:bg-[#beaf87] hover:text-black"
+              >
+                Todos os imóveis Maria
+                <ExternalLink className="ml-3 h-4 w-4" />
+              </a>
+
+              <a
+                href={PAULO_PROPERTIES_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-14 items-center justify-center rounded-2xl bg-[#beaf87] px-6 py-4 text-center text-xs font-extrabold uppercase tracking-[0.14em] text-black transition hover:brightness-105"
+              >
+                Todos os imóveis Paulo
+                <ExternalLink className="ml-3 h-4 w-4" />
+              </a>
+            </div>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-3">
-            {["Imóvel em breve", "Novas oportunidades", "Catálogo em construção"].map((title) => (
-              <article key={title} className="rounded-[2rem] border border-[#beaf87]/25 bg-white p-7 shadow-[0_24px_70px_rgba(40,32,20,0.08)]">
-                <div className="mb-6 flex h-44 items-center justify-center rounded-[1.5rem] border border-[#beaf87]/20 bg-[#fbfaf7]">
-                  <Building2 className="h-10 w-10 text-[#beaf87]" />
-                </div>
-                <h3 className="font-serif text-2xl text-[#2a2418]">{title}</h3>
-                <p className="mt-3 text-sm leading-7 text-[#171717]/62">
-                  Informação em atualização. Os imóveis serão apresentados nesta área assim que forem adicionados ao back-office.
-                </p>
-              </article>
-            ))}
-          </div>
+          {propertiesError && (
+            <div className="mb-8 rounded-2xl border border-red-300 bg-red-50 px-5 py-4 text-sm text-red-700">
+              {propertiesError}
+            </div>
+          )}
+
+          {propertiesLoading ? (
+            <div className="flex min-h-[320px] items-center justify-center rounded-[2rem] border border-[#beaf87]/25 bg-white text-sm text-[#171717]/54 shadow-[0_24px_70px_rgba(40,32,20,0.06)]">
+              <Loader2 className="mr-3 h-5 w-5 animate-spin text-[#beaf87]" />
+              A carregar imóveis disponíveis...
+            </div>
+          ) : propertySlots.length === 0 ? (
+            <div className="flex min-h-[320px] flex-col items-center justify-center rounded-[2rem] border border-dashed border-[#beaf87]/35 bg-white px-6 text-center">
+              <Building2 className="mb-5 h-11 w-11 text-[#beaf87]" />
+              <h3 className="font-serif text-3xl text-[#2a2418]">
+                Ainda não existem imóveis publicados.
+              </h3>
+              <p className="mt-4 max-w-lg text-sm leading-7 text-[#171717]/60">
+                Assim que os imóveis forem publicados no back-office, aparecerão automaticamente nesta área.
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {propertySlots.map((property) => (
+                <PropertyCard key={property.id} property={property} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -263,7 +507,9 @@ export default function ClienteHomeCentury21() {
           <div>
             <div className="mb-6 flex flex-col items-center gap-1 lg:items-start">
               <img src={LOGO} alt="CENTURY 21" className="h-14 w-auto object-contain" />
-              <span className="text-xs font-semibold uppercase tracking-[0.38em] text-[#beaf87]">Nações</span>
+              <span className="text-xs font-semibold uppercase tracking-[0.38em] text-[#beaf87]">
+                Nações
+              </span>
             </div>
             <h3 className="font-serif text-3xl text-[#2a2418]">Paulo Matos</h3>
             <p className="mt-1 text-[#171717]/68">Consultor Imobiliário</p>
@@ -279,7 +525,9 @@ export default function ClienteHomeCentury21() {
           </div>
 
           <div className="flex flex-col items-center gap-4 text-sm text-[#171717]/68 lg:items-end">
-            <a href="/politica-de-privacidade-e-cookies" className="transition hover:text-[#beaf87]">Política de Privacidade e Cookies</a>
+            <a href="/politica-de-privacidade-e-cookies" className="transition hover:text-[#beaf87]">
+              Política de Privacidade e Cookies
+            </a>
           </div>
         </div>
 
