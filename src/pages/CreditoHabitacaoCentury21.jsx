@@ -22,7 +22,7 @@ export default function CreditoHabitacaoCentury21() {
     { label: "Sobre Nós", href: "/#sobre" },
     { label: "Apoio Jurídico", href: "/apoio-juridico" },
     { label: "Crédito Habitação", href: "/credito-habitacao", active: true },
-    { label: "Contacte-nos", href: "/#contacte-nos" },
+    { label: "Contacte-nos", href: "/contacte-nos" },
   ];
 
   return (

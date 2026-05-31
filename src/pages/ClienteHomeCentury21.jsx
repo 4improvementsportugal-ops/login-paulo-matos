@@ -53,7 +53,7 @@ export default function ClienteHomeCentury21() {
     { label: "Sobre Nós", href: "#home", section: true },
     { label: "Apoio Jurídico", href: "/apoio-juridico", section: false },
     { label: "Crédito Habitação", href: "/credito-habitacao", section: false },
-    { label: "Contacte-nos", href: "#contacte-nos", section: true },
+    { label: "Contacte-nos", href: "contacte-nos", section: true },
   ];
 
   function handleNavClick(event, item) {

@@ -265,7 +265,7 @@ function PublicNavbar({
     { label: "Sobre Nós", href: "/#home" },
     { label: "Apoio Jurídico", href: "/apoio-juridico", active: true },
     { label: "Crédito Habitação", href: "/credito-habitacao" },
-    { label: "Contacte-nos", href: "/#contacte-nos" },
+    { label: "Contacte-nos", href: "/contacte-nos" },
   ];
 
   function handleLink(event, item) {
