@@ -19,7 +19,7 @@ export default function CreditoHabitacaoCentury21() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   const navItems = [
-    { label: "Sobre Nós", href: "/#sobre" },
+    { label: "Sobre Nós", href: "/sobre-nos" },
     { label: "Apoio Jurídico", href: "/apoio-juridico" },
     { label: "Crédito Habitação", href: "/credito-habitacao", active: true },
     { label: "Contacte-nos", href: "/contacte-nos" },

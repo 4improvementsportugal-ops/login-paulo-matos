@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Mail,
   MapPin,
@@ -9,12 +9,8 @@ import {
 } from "lucide-react";
 
 const LOGO = "/assets/logosite.png";
-
-const MAP_EMBED_URL =
-  "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4651.468143284943!2d-9.208721522898792!3d38.74572857175669!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd1eccd949fc4aed%3A0x58c5d858199ae05a!2sR.%20Casquilha%202%2C%201500-154%20Lisboa%2C%20Portugal!5e1!3m2!1spt-BR!2sbr!4v1780226053359!5m2!1spt-BR!2sbr";
-
-const CONTACT_FORM_URL =
-  "https://api.leadconnectorhq.com/widget/form/7IiXoIfWD9V7uBsO3RFj";
+const PAULO_VIDEO = "https://www.youtube.com/embed/qTAhNY9Lklw";
+const MARIA_VIDEO = "https://www.youtube.com/embed/aUb4Sl57rS4";
 
 const consultants = [
   {
@@ -24,6 +20,9 @@ const consultants = [
     phoneHref: "tel:+351919783014",
     email: "pjmatos@century21.pt",
     emailHref: "mailto:pjmatos@century21.pt",
+    video: PAULO_VIDEO,
+    description:
+      "Paulo Matos apresenta a visão, o acompanhamento e a proximidade que caracterizam o trabalho da equipa C21 Nações.",
   },
   {
     name: "Maria Carreiro",
@@ -32,6 +31,9 @@ const consultants = [
     phoneHref: "tel:+351937219215",
     email: "mjcarreiro@century21.pt",
     emailHref: "mailto:mjcarreiro@century21.pt",
+    video: MARIA_VIDEO,
+    description:
+      "Maria Carreiro partilha a importância de um serviço próximo, transparente e orientado para cada cliente.",
   },
 ];
 
@@ -50,26 +52,14 @@ function BrandLogo() {
   );
 }
 
-export default function ContacteNosCentury21() {
+export default function SobreNosCentury21() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  useEffect(() => {
-    const scriptId = "ghl-form-embed-script";
-
-    if (!document.getElementById(scriptId)) {
-      const script = document.createElement("script");
-      script.id = scriptId;
-      script.src = "https://link.msgsndr.com/js/form_embed.js";
-      script.async = true;
-      document.body.appendChild(script);
-    }
-  }, []);
-
   const navItems = [
-    { label: "Sobre Nós", href: "/sobre-nos" },
+    { label: "Sobre Nós", href: "/sobre-nos", active: true },
     { label: "Apoio Jurídico", href: "/apoio-juridico" },
     { label: "Crédito Habitação", href: "/credito-habitacao" },
-    { label: "Contacte-nos", href: "/contacte-nos", active: true },
+    { label: "Contacte-nos", href: "/contacte-nos" },
   ];
 
   return (
@@ -133,91 +123,68 @@ export default function ContacteNosCentury21() {
         <HeroBackground />
         <div className="relative mx-auto flex max-w-7xl flex-col items-center px-6 py-16 text-center sm:px-8 sm:py-20 lg:py-24">
           <p className="mb-5 text-xs font-bold uppercase tracking-[0.4em] text-[#beaf87] sm:text-sm">
-            Fale connosco
+            Conheça a equipa
           </p>
           <h1 className="max-w-4xl font-serif text-4xl leading-tight text-[#2a2418] sm:text-5xl lg:text-6xl">
-            Contacte-nos
+            Sobre Nós
           </h1>
-          <p className="mt-6 max-w-2xl text-base leading-8 text-[#171717]/68 sm:text-lg">
-            Estamos disponíveis para esclarecer dúvidas, avaliar o seu imóvel e acompanhar o seu próximo passo no mercado imobiliário.
-          </p>
         </div>
       </section>
 
       <section className="px-5 py-12 sm:px-8 sm:py-16 lg:px-10">
-        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:gap-12">
-          <div className="space-y-8">
-            <div className="rounded-[2rem] border border-[#beaf87]/24 bg-[#fbfaf7] p-6 shadow-[0_22px_70px_rgba(40,32,20,0.08)] sm:p-8">
-              <p className="mb-4 text-xs font-bold uppercase tracking-[0.32em] text-[#beaf87]">
-                Morada
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-12 grid gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:items-end">
+            <div>
+              <p className="mb-4 text-xs font-bold uppercase tracking-[0.34em] text-[#beaf87]">
+                C21 Nações
               </p>
-              <div className="flex items-start gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#beaf87]/25 bg-white">
-                  <MapPin className="h-5 w-5 text-[#beaf87]" />
-                </div>
-                <div>
-                  <h2 className="font-serif text-3xl leading-tight text-[#2a2418]">
-                    CENTURY 21 Nações IX
-                  </h2>
-                  <p className="mt-3 text-base leading-8 text-[#171717]/68">
-                    Rua Casquilha 2, 1500-151 Lisboa
-                  </p>
-                </div>
-              </div>
+              <h2 className="font-serif text-4xl leading-tight text-[#2a2418] sm:text-5xl">
+                Uma equipa focada em criar uma experiência imobiliária mais próxima.
+              </h2>
             </div>
-
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-              {consultants.map((consultant) => (
-                <ConsultantCard key={consultant.email} consultant={consultant} />
-              ))}
-            </div>
-
-            <div className="overflow-hidden rounded-[2rem] border border-[#beaf87]/24 bg-[#fbfaf7] shadow-[0_22px_70px_rgba(40,32,20,0.08)]">
-              <iframe
-                src={MAP_EMBED_URL}
-                title="Localização - Rua Casquilha 2, Lisboa"
-                width="600"
-                height="450"
-                loading="lazy"
-                allowFullScreen
-                referrerPolicy="no-referrer-when-downgrade"
-                className="h-[340px] w-full border-0 sm:h-[430px]"
-              />
-            </div>
+            <p className="text-base leading-8 text-[#171717]/68 sm:text-lg">
+              A C21 Nações combina conhecimento local, acompanhamento personalizado e uma abordagem orientada para resultados. Nesta página, Paulo Matos e Maria Carreiro apresentam, em vídeo, a forma como trabalham e o que significa fazer parte desta equipa.
+            </p>
           </div>
 
-          <div className="lg:sticky lg:top-28 lg:h-fit">
-            <div className="overflow-hidden rounded-[2rem] border border-[#beaf87]/24 bg-[#fbfaf7] p-2 shadow-[0_28px_90px_rgba(40,32,20,0.12)]">
-              <div className="px-5 pb-4 pt-5 sm:px-6 sm:pt-6">
-                <p className="mb-3 text-xs font-bold uppercase tracking-[0.28em] text-[#beaf87]">
-                  Formulário de contacto
-                </p>
-                <h2 className="font-serif text-3xl leading-tight text-[#2a2418] sm:text-4xl">
-                  Entre em contacto
-                </h2>
-                <p className="mt-3 text-sm leading-7 text-[#171717]/62">
-                  Preencha os dados abaixo e a equipa entrará em contacto consigo com a maior brevidade possível.
-                </p>
-              </div>
-
-              <iframe
-                src={CONTACT_FORM_URL}
-                title="CONTACTO"
-                id="inline-7IiXoIfWD9V7uBsO3RFj"
-                data-layout="{'id':'INLINE'}"
-                data-trigger-type="alwaysShow"
-                data-trigger-value=""
-                data-activation-type="alwaysActivated"
-                data-activation-value=""
-                data-deactivation-type="neverDeactivate"
-                data-deactivation-value=""
-                data-form-name="CONTACTO"
-                data-height="693"
-                data-layout-iframe-id="inline-7IiXoIfWD9V7uBsO3RFj"
-                data-form-id="7IiXoIfWD9V7uBsO3RFj"
-                className="block h-[760px] w-full rounded-[24px] border-0 bg-white sm:h-[735px]"
+          <div className="grid gap-8 lg:grid-cols-2 xl:gap-10">
+            {consultants.map((consultant) => (
+              <ConsultantVideoCard
+                key={consultant.email}
+                consultant={consultant}
               />
-            </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-[#beaf87]/20 bg-[#fbfaf7] px-5 py-14 sm:px-8 sm:py-16 lg:px-10">
+        <div className="mx-auto grid max-w-7xl gap-8 rounded-[2rem] border border-[#beaf87]/24 bg-white p-7 shadow-[0_22px_70px_rgba(40,32,20,0.08)] sm:p-10 lg:grid-cols-[1fr_0.8fr] lg:items-center">
+          <div>
+            <p className="mb-4 text-xs font-bold uppercase tracking-[0.34em] text-[#beaf87]">
+              Acompanhamento imobiliário
+            </p>
+            <h2 className="font-serif text-3xl leading-tight text-[#2a2418] sm:text-4xl">
+              Precisa de apoio para comprar, vender ou avaliar um imóvel?
+            </h2>
+            <p className="mt-5 max-w-2xl text-base leading-8 text-[#171717]/64">
+              Fale connosco para percebermos o seu objetivo e indicarmos o melhor próximo passo.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-3 sm:flex-row lg:justify-end">
+            <a
+              href="/contacte-nos"
+              className="inline-flex h-14 items-center justify-center rounded-2xl bg-[#beaf87] px-7 text-sm font-extrabold uppercase tracking-[0.14em] text-black transition hover:brightness-105"
+            >
+              Contacte-nos
+            </a>
+            <a
+              href="/credito-habitacao"
+              className="inline-flex h-14 items-center justify-center rounded-2xl border border-[#beaf87]/45 bg-white px-7 text-sm font-extrabold uppercase tracking-[0.14em] text-[#2a2418] transition hover:bg-[#beaf87] hover:text-black"
+            >
+              Crédito Habitação
+            </a>
           </div>
         </div>
       </section>
@@ -227,36 +194,52 @@ export default function ContacteNosCentury21() {
   );
 }
 
-function ConsultantCard({ consultant }) {
+function ConsultantVideoCard({ consultant }) {
   return (
-    <article className="rounded-[2rem] border border-[#beaf87]/24 bg-white p-6 shadow-[0_18px_54px_rgba(40,32,20,0.07)]">
-      <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-full border border-[#beaf87]/25 bg-[#fbfaf7]">
-        <UserRound className="h-5 w-5 text-[#beaf87]" />
-      </div>
+    <article className="overflow-hidden rounded-[2rem] border border-[#beaf87]/24 bg-white shadow-[0_24px_80px_rgba(40,32,20,0.11)]">
+      <div className="grid gap-0 lg:grid-cols-[0.82fr_1fr]">
+        <div className="relative bg-black">
+          <div className="relative aspect-[9/16] h-full w-full overflow-hidden bg-black">
+            <iframe
+              src={consultant.video}
+              title={`Vídeo de ${consultant.name}`}
+              className="absolute inset-0 h-full w-full border-0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              loading="lazy"
+            />
+          </div>
+        </div>
 
-      <p className="text-xs font-bold uppercase tracking-[0.26em] text-[#beaf87]">
-        {consultant.role}
-      </p>
-      <h3 className="mt-3 font-serif text-3xl leading-tight text-[#2a2418]">
-        {consultant.name}
-      </h3>
+        <div className="flex flex-col justify-center p-6 sm:p-8 lg:p-9">
+          <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#beaf87]">
+            {consultant.role}
+          </p>
+          <h3 className="mt-3 font-serif text-4xl leading-tight text-[#2a2418]">
+            {consultant.name}
+          </h3>
+          <p className="mt-5 text-base leading-8 text-[#171717]/66">
+            {consultant.description}
+          </p>
 
-      <div className="mt-6 space-y-4 text-sm text-[#171717]/68">
-        <a
-          href={consultant.phoneHref}
-          className="flex items-center gap-3 transition hover:text-[#beaf87]"
-        >
-          <Phone className="h-4 w-4 shrink-0 text-[#beaf87]" />
-          <span>Tlm: {consultant.phone}</span>
-        </a>
+          <div className="mt-7 space-y-4 text-sm text-[#171717]/68">
+            <a
+              href={consultant.phoneHref}
+              className="flex items-center gap-3 transition hover:text-[#beaf87]"
+            >
+              <Phone className="h-4 w-4 shrink-0 text-[#beaf87]" />
+              <span>Tlm: {consultant.phone}</span>
+            </a>
 
-        <a
-          href={consultant.emailHref}
-          className="flex items-center gap-3 break-all transition hover:text-[#beaf87]"
-        >
-          <Mail className="h-4 w-4 shrink-0 text-[#beaf87]" />
-          <span>{consultant.email}</span>
-        </a>
+            <a
+              href={consultant.emailHref}
+              className="flex items-center gap-3 break-all transition hover:text-[#beaf87]"
+            >
+              <Mail className="h-4 w-4 shrink-0 text-[#beaf87]" />
+              <span>{consultant.email}</span>
+            </a>
+          </div>
+        </div>
       </div>
     </article>
   );
