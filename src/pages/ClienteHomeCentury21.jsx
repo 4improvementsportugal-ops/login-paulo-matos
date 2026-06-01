@@ -502,40 +502,81 @@ export default function ClienteHomeCentury21() {
         </div>
       </section>
 
-      <footer className="border-t border-[#beaf87]/20 bg-[#fbfaf7] px-5 py-12 sm:px-8 lg:px-10">
-        <div className="mx-auto grid max-w-7xl gap-10 text-center lg:grid-cols-[1fr_1.2fr_0.8fr] lg:text-left">
-          <div>
-            <div className="mb-6 flex flex-col items-center gap-1 lg:items-start">
-              <img src={LOGO} alt="CENTURY 21" className="h-14 w-auto object-contain" />
-              <span className="text-xs font-semibold uppercase tracking-[0.38em] text-[#beaf87]">
-                Nações
-              </span>
+      <footer className="border-t border-[#beaf87]/20 bg-[#fbfaf7] px-6 py-12 sm:px-8 lg:px-10">
+      <div className="mx-auto grid max-w-7xl gap-10 text-center lg:grid-cols-[1fr_1.2fr_0.8fr] lg:text-left">
+        <div>
+          <div className="mb-6 flex flex-col items-center gap-1 lg:items-start">
+            <img
+              src={LOGO}
+              alt="CENTURY 21"
+              className="h-14 w-auto object-contain"
+            />
+            <span className="text-xs font-semibold uppercase tracking-[0.38em] text-[#beaf87]">
+              Nações
+            </span>
+          </div>
+
+          <div className="space-y-5">
+            <div>
+              <h3 className="font-serif text-3xl text-[#2a2418]">
+                Paulo Matos
+              </h3>
+              <p className="mt-1 text-[#171717]/68">
+                Consultor Imobiliário
+              </p>
             </div>
-            <h3 className="font-serif text-3xl text-[#2a2418]">Paulo Matos</h3>
-            <p className="mt-1 text-[#171717]/68">Consultor Imobiliário</p>
-            <p className="mt-5 text-lg font-bold text-[#171717]">CENTURY 21.</p>
-            <p className="text-[#beaf87]">Nações</p>
+
+            <div>
+              <h3 className="font-serif text-3xl text-[#2a2418]">
+                Maria Carreiro
+              </h3>
+              <p className="mt-1 text-[#171717]/68">
+                Consultora Imobiliária
+              </p>
+            </div>
           </div>
 
-          <div className="space-y-4 text-sm leading-7 text-[#171717]/68">
-            <p className="flex flex-col items-center gap-3 lg:flex-row lg:items-start">
-              <MapPin className="mt-1 h-4 w-4 shrink-0 text-[#beaf87]" />
-              <span>CENTURY 21 Nações IX<br />Rua Casquilha 2, 1500-151 Lisboa</span>
-            </p>
-          </div>
-
-          <div className="flex flex-col items-center gap-4 text-sm text-[#171717]/68 lg:items-end">
-            <a href="/politica-de-privacidade-e-cookies" className="transition hover:text-[#beaf87]">
-              Política de Privacidade e Cookies
-            </a>
-          </div>
+          <p className="mt-6 text-lg font-bold text-[#171717]">
+            CENTURY 21.
+          </p>
+          <p className="text-[#beaf87]">Nações</p>
         </div>
 
-        <div className="mx-auto mt-10 max-w-7xl border-t border-[#beaf87]/20 pt-6 text-center text-xs leading-6 text-[#171717]/46">
-          <p>Cada agência é jurídica e financeiramente independente.</p>
-          <p>DNZ - Mediação Imobiliária, LDA AMI 10786</p>
+        <div className="space-y-4 text-sm leading-7 text-[#171717]/68">
+          <p className="flex flex-col items-center gap-3 lg:flex-row lg:items-start">
+            <MapPin className="mt-1 h-4 w-4 shrink-0 text-[#beaf87]" />
+            <span>
+              CENTURY 21 Nações IX
+              <br />
+              Rua Casquilha 2, 1500-151 Lisboa
+            </span>
+          </p>
+
+    
         </div>
-      </footer>
+
+        <div className="flex flex-col items-center gap-4 text-sm text-[#171717]/68 lg:items-end">
+          <a
+            href="/contacte-nos"
+            className="transition hover:text-[#beaf87]"
+          >
+            Contacte-nos
+          </a>
+
+          <a
+            href="/politica-de-privacidade-e-cookies"
+            className="transition hover:text-[#beaf87]"
+          >
+            Política de Privacidade e Cookies
+          </a>
+        </div>
+      </div>
+
+      <div className="mx-auto mt-10 max-w-7xl border-t border-[#beaf87]/20 pt-6 text-center text-xs leading-6 text-[#171717]/46">
+        <p>Cada agência é jurídica e financeiramente independente.</p>
+        <p>DNZ - Mediação Imobiliária, LDA AMI 10786</p>
+      </div>
+    </footer>
     </main>
   );
 }

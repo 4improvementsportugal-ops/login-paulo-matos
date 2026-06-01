@@ -8,11 +8,9 @@ import {
   Camera,
   Check,
   ChevronDown,
-  ExternalLink,
   FileText,
   Home,
   ImagePlus,
-  Link2,
   ListChecks,
   Loader2,
   LogOut,
@@ -38,6 +36,9 @@ const DEFAULT_SUPABASE_KEY =
 const STORAGE_BUCKET = "property-photos";
 const MAX_PUBLISHED_PROPERTIES = 8;
 const MAX_PROPERTY_PHOTOS = 12;
+
+const FIXED_CREDIT_SIMULATION_URL =
+  "https://pjmatos.century21.pt/credito-habitacao";
 
 function normalizeSupabaseUrl(url) {
   return url.replace(/\/rest\/v1\/?$/, "");
@@ -132,6 +133,7 @@ const EMPTY_FORM = {
   consultant: "paulo",
   transactionType: "Venda",
   propertyType: "Apartamento",
+  customPropertyType: "",
   price: "",
   area: "",
   bedrooms: "",
@@ -148,7 +150,6 @@ const EMPTY_FORM = {
   shortDescription: "",
   description: "",
   characteristicsText: "",
-  creditSimulationUrl: "",
   seoTitle: "",
   seoDescription: "",
   photos: [],
@@ -159,7 +160,6 @@ const EDITOR_TABS = [
   { id: "descricao", label: "Descrição", icon: FileText },
   { id: "localizacao", label: "Localização", icon: MapPin },
   { id: "caracteristicas", label: "Características", icon: ListChecks },
-  { id: "credito", label: "Simular crédito", icon: Link2 },
 ];
 
 function removeAccents(value = "") {
@@ -193,21 +193,8 @@ function countWords(text = "") {
   return normalized.split(" ").filter(Boolean).length;
 }
 
-function isValidUrl(value = "") {
-  if (!value.trim()) {
-    return false;
-  }
-
-  try {
-    const url = new URL(value);
-    return ["http:", "https:"].includes(url.protocol);
-  } catch {
-    return false;
-  }
-}
-
 function formatCurrency(value) {
-  const number = Number(String(value).replace(/[^0-9.]/g, ""));
+  const number = Number(String(value || "").replace(/[^0-9.]/g, ""));
 
   if (!number) {
     return "Preço sob consulta";
@@ -264,6 +251,27 @@ function characteristicsToText(value) {
   return "";
 }
 
+function buildPropertyTypeOptions(properties = []) {
+  const defaultTypes = PROPERTY_TYPES.filter((type) => type !== "Outro");
+
+  const customTypes = properties
+    .map((property) => normalizeSpaces(property.property_type || ""))
+    .filter(Boolean)
+    .filter((type) => !PROPERTY_TYPES.includes(type));
+
+  const uniqueCustomTypes = [...new Set(customTypes)];
+
+  return [...defaultTypes, ...uniqueCustomTypes, "Outro"];
+}
+
+function getEffectivePropertyType(form) {
+  if (form.propertyType === "Outro") {
+    return normalizeSpaces(form.customPropertyType || "");
+  }
+
+  return normalizeSpaces(form.propertyType || "");
+}
+
 function calculatePropertySeo(form, pendingPhotos = []) {
   const title = form.seoTitle.trim() || form.title.trim();
   const description = normalizeSpaces(form.description);
@@ -274,9 +282,11 @@ function calculatePropertySeo(form, pendingPhotos = []) {
   );
 
   const characteristics = parseCharacteristics(form.characteristicsText);
+  const effectivePropertyType =
+    getEffectivePropertyType(form) || form.propertyType;
 
   const keyword = normalizeSpaces(
-    `${form.propertyType} ${form.transactionType} ${form.city}`
+    `${effectivePropertyType} ${form.transactionType} ${form.city}`
   );
 
   const titleLength = title.length;
@@ -364,7 +374,7 @@ function calculatePropertySeo(form, pendingPhotos = []) {
     {
       group: "SEO",
       label: "Termos-chave aparecem no conteúdo",
-      passed: [form.propertyType, form.transactionType, form.city].every(
+      passed: [effectivePropertyType, form.transactionType, form.city].every(
         (term) => normalizeText(fullText).includes(normalizeText(term))
       ),
       tip: "Inclua tipo de imóvel, objetivo e localização no texto.",
@@ -380,12 +390,6 @@ function calculatePropertySeo(form, pendingPhotos = []) {
       label: "Fotografia de capa definida",
       passed: hasCoverPhoto,
       tip: "A primeira fotografia adicionada será usada como capa automaticamente.",
-    },
-    {
-      group: "Conversão",
-      label: "Link de simulação de crédito válido",
-      passed: isValidUrl(form.creditSimulationUrl),
-      tip: "Insira um link válido para o botão Simular crédito.",
     },
     {
       group: "Conversão",
@@ -431,8 +435,10 @@ function calculatePropertySeo(form, pendingPhotos = []) {
   };
 }
 
-function mapDatabaseProperty(property) {
+function mapDatabaseProperty(property, propertyTypeOptions = PROPERTY_TYPES) {
   const photos = Array.isArray(property.photos) ? property.photos : [];
+  const databasePropertyType = property.property_type || "Apartamento";
+  const propertyTypeExists = propertyTypeOptions.includes(databasePropertyType);
 
   return {
     id: property.id,
@@ -441,7 +447,8 @@ function mapDatabaseProperty(property) {
     status: property.status || "rascunho",
     consultant: property.consultant || "paulo",
     transactionType: property.transaction_type || "Venda",
-    propertyType: property.property_type || "Apartamento",
+    propertyType: propertyTypeExists ? databasePropertyType : "Outro",
+    customPropertyType: propertyTypeExists ? "" : databasePropertyType,
     price: property.price ? String(property.price) : "",
     area: property.area ? String(property.area) : "",
     bedrooms: property.bedrooms ? String(property.bedrooms) : "",
@@ -460,7 +467,6 @@ function mapDatabaseProperty(property) {
     shortDescription: property.short_description || "",
     description: property.description || "",
     characteristicsText: characteristicsToText(property.characteristics),
-    creditSimulationUrl: property.credit_simulation_url || "",
     seoTitle: property.seo_title || "",
     seoDescription: property.seo_description || "",
     seoScore: property.seo_score || 0,
@@ -496,6 +502,8 @@ export default function GestaoImoveisCentury21() {
   const [loggedUserEmail, setLoggedUserEmail] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [properties, setProperties] = useState([]);
+  const [propertyTypeOptions, setPropertyTypeOptions] =
+    useState(PROPERTY_TYPES);
   const [view, setView] = useState("list");
   const [form, setForm] = useState({ ...EMPTY_FORM });
   const [activeTab, setActiveTab] = useState("descricao");
@@ -572,7 +580,15 @@ export default function GestaoImoveisCentury21() {
       });
       setProperties([]);
     } else {
-      setProperties((data || []).map(mapDatabaseProperty));
+      const rows = data || [];
+      const updatedPropertyTypes = buildPropertyTypeOptions(rows);
+
+      setPropertyTypeOptions(updatedPropertyTypes);
+      setProperties(
+        rows.map((property) =>
+          mapDatabaseProperty(property, updatedPropertyTypes)
+        )
+      );
     }
 
     setLoadingProperties(false);
@@ -600,12 +616,17 @@ export default function GestaoImoveisCentury21() {
     const term = searchText.trim().toLowerCase();
 
     return properties.filter((property) => {
+      const visiblePropertyType =
+        property.propertyType === "Outro"
+          ? property.customPropertyType || "Outro"
+          : property.propertyType;
+
       const matchesTerm =
         !term ||
         property.title.toLowerCase().includes(term) ||
         property.city.toLowerCase().includes(term) ||
         property.parish.toLowerCase().includes(term) ||
-        property.propertyType.toLowerCase().includes(term);
+        visiblePropertyType.toLowerCase().includes(term);
 
       const matchesStatus =
         statusFilter === "todos" || property.status === statusFilter;
@@ -660,6 +681,50 @@ export default function GestaoImoveisCentury21() {
       ...current,
       [field]: value,
     }));
+  }
+
+  function addPropertyTypeOption(type) {
+    const normalizedType = normalizeSpaces(type);
+
+    if (!normalizedType) {
+      setNotice({
+        type: "error",
+        text: "Introduza o novo tipo de imóvel antes de adicionar.",
+      });
+      return false;
+    }
+
+    const existingType = propertyTypeOptions.find(
+      (option) => normalizeText(option) === normalizeText(normalizedType)
+    );
+
+    const finalType = existingType || normalizedType;
+
+    setPropertyTypeOptions((current) => {
+      const currentWithoutOutro = current.filter((option) => option !== "Outro");
+      const alreadyExists = currentWithoutOutro.some(
+        (option) => normalizeText(option) === normalizeText(finalType)
+      );
+
+      if (alreadyExists) {
+        return current;
+      }
+
+      return [...currentWithoutOutro, finalType, "Outro"];
+    });
+
+    setForm((current) => ({
+      ...current,
+      propertyType: finalType,
+      customPropertyType: "",
+    }));
+
+    setNotice({
+      type: "success",
+      text: `Tipo de imóvel "${finalType}" adicionado. Ao guardar o imóvel, ele ficará disponível para reutilização.`,
+    });
+
+    return true;
   }
 
   function handlePhotoChange(event) {
@@ -809,9 +874,14 @@ export default function GestaoImoveisCentury21() {
   function validateBeforeSave(status) {
     const title = form.title.trim();
     const totalPhotosCount = form.photos.length + photoFiles.length;
+    const effectivePropertyType = getEffectivePropertyType(form);
 
     if (!title) {
       return "Introduza o título do imóvel antes de guardar.";
+    }
+
+    if (!effectivePropertyType) {
+      return "Introduza o tipo de imóvel antes de guardar.";
     }
 
     if (totalPhotosCount > MAX_PROPERTY_PHOTOS) {
@@ -830,7 +900,7 @@ export default function GestaoImoveisCentury21() {
 
       if (
         !form.slug.trim() ||
-        !form.propertyType ||
+        !effectivePropertyType ||
         !form.transactionType ||
         !form.consultant
       ) {
@@ -843,10 +913,6 @@ export default function GestaoImoveisCentury21() {
 
       if (!form.city.trim() || !form.parish.trim()) {
         return "Para publicar, preencha cidade e freguesia.";
-      }
-
-      if (!isValidUrl(form.creditSimulationUrl)) {
-        return "Para publicar, adicione um link válido para o botão Simular crédito.";
       }
 
       if (totalPhotosCount < 4) {
@@ -879,6 +945,7 @@ export default function GestaoImoveisCentury21() {
 
     try {
       let propertyId = form.id;
+      const effectivePropertyType = getEffectivePropertyType(form);
 
       const basePayload = {
         title: form.title.trim(),
@@ -886,7 +953,7 @@ export default function GestaoImoveisCentury21() {
         status,
         consultant: form.consultant,
         transaction_type: form.transactionType,
-        property_type: form.propertyType,
+        property_type: effectivePropertyType,
         price: form.price ? Number(form.price) : null,
         area: form.area ? Number(form.area) : null,
         bedrooms: form.bedrooms ? Number(form.bedrooms) : null,
@@ -905,7 +972,7 @@ export default function GestaoImoveisCentury21() {
         short_description: form.shortDescription.trim(),
         description: form.description.trim(),
         characteristics: parseCharacteristics(form.characteristicsText),
-        credit_simulation_url: form.creditSimulationUrl.trim(),
+        credit_simulation_url: FIXED_CREDIT_SIMULATION_URL,
         seo_title: form.seoTitle.trim(),
         seo_description: form.seoDescription.trim(),
         seo_score: seo.score,
@@ -1191,6 +1258,8 @@ export default function GestaoImoveisCentury21() {
             ) : (
               <PropertyEditor
                 form={form}
+                propertyTypeOptions={propertyTypeOptions}
+                onAddPropertyType={addPropertyTypeOption}
                 updateField={updateField}
                 seo={seo}
                 notice={notice}
@@ -1321,7 +1390,10 @@ function PropertiesList({
           <SelectFilter
             value={consultantFilter}
             onChange={setConsultantFilter}
-            options={["todos", ...CONSULTANTS.map((consultant) => consultant.id)]}
+            options={[
+              "todos",
+              ...CONSULTANTS.map((consultant) => consultant.id),
+            ]}
             labels={{
               todos: "Todos os consultores",
               paulo: "Paulo Matos",
@@ -1410,6 +1482,10 @@ function PropertyRow({ property, onEdit, onDelete, deleting }) {
   );
 
   const cover = property.coverPhotoUrl || property.photos[0]?.url;
+  const visiblePropertyType =
+    property.propertyType === "Outro"
+      ? property.customPropertyType || "Outro"
+      : property.propertyType;
 
   return (
     <article className="grid gap-4 px-2 py-5 sm:px-4 lg:grid-cols-[minmax(280px,1fr)_150px_140px_140px_130px] lg:items-center">
@@ -1433,8 +1509,8 @@ function PropertyRow({ property, onEdit, onDelete, deleting }) {
           <p className="mt-1 text-sm text-[#beaf87]">
             {formatCurrency(property.price)}
           </p>
-          <p className="mt-1 truncate text-xs text-white/42">
-            /{property.slug}
+          <p className="mt-1 text-xs text-white/42">
+            {visiblePropertyType} · /{property.slug}
           </p>
         </div>
       </div>
@@ -1494,6 +1570,8 @@ function StatusBadge({ status }) {
 
 function PropertyEditor({
   form,
+  propertyTypeOptions,
+  onAddPropertyType,
   updateField,
   seo,
   notice,
@@ -1511,6 +1589,22 @@ function PropertyEditor({
   onPublish,
 }) {
   const allPhotosCount = form.photos.length + photoFiles.length;
+  const [showNewPropertyType, setShowNewPropertyType] = useState(false);
+  const [newPropertyType, setNewPropertyType] = useState("");
+
+  function handleAddNewPropertyType() {
+    const added = onAddPropertyType(newPropertyType);
+
+    if (added) {
+      setNewPropertyType("");
+      setShowNewPropertyType(false);
+    }
+  }
+
+  function handleCancelNewPropertyType() {
+    setNewPropertyType("");
+    setShowNewPropertyType(false);
+  }
 
   const canPublishMore =
     form.status === "publicado" || publishedCount < MAX_PUBLISHED_PROPERTIES;
@@ -1640,22 +1734,88 @@ function PropertyEditor({
               </FormField>
 
               <FormField label="Tipo de imóvel">
-                <div className="relative">
-                  <select
-                    value={form.propertyType}
-                    onChange={(event) =>
-                      updateField("propertyType", event.target.value)
-                    }
-                    className="field-input appearance-none pr-12"
-                  >
-                    {PROPERTY_TYPES.map((type) => (
-                      <option key={type} value={type}>
-                        {type}
-                      </option>
-                    ))}
-                  </select>
+                <div className="space-y-3">
+                  <div className="grid grid-cols-[minmax(0,1fr)_54px] gap-3">
+                    <div className="relative">
+                      <select
+                        value={form.propertyType}
+                        onChange={(event) => {
+                          const selectedType = event.target.value;
 
-                  <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#beaf87]" />
+                          updateField("propertyType", selectedType);
+
+                          if (selectedType !== "Outro") {
+                            updateField("customPropertyType", "");
+                          }
+                        }}
+                        className="field-input appearance-none pr-12"
+                      >
+                        {propertyTypeOptions.map((type) => (
+                          <option key={type} value={type}>
+                            {type}
+                          </option>
+                        ))}
+                      </select>
+
+                      <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#beaf87]" />
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPropertyType(true)}
+                      className="flex h-[54px] items-center justify-center rounded-2xl border border-[#beaf87]/24 bg-[#beaf87]/10 text-[#beaf87] transition hover:bg-[#beaf87] hover:text-black"
+                      aria-label="Adicionar novo tipo de imóvel"
+                      title="Adicionar novo tipo de imóvel"
+                    >
+                      <Plus className="h-5 w-5" />
+                    </button>
+                  </div>
+
+                  {showNewPropertyType && (
+                    <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_auto]">
+                      <input
+                        type="text"
+                        value={newPropertyType}
+                        onChange={(event) => setNewPropertyType(event.target.value)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter") {
+                            event.preventDefault();
+                            handleAddNewPropertyType();
+                          }
+                        }}
+                        placeholder="Novo tipo. Ex.: Quinta, Duplex, Armazém"
+                        className="field-input"
+                      />
+
+                      <button
+                        type="button"
+                        onClick={handleAddNewPropertyType}
+                        className="min-h-[54px] rounded-2xl bg-[#beaf87] px-5 text-xs font-extrabold uppercase tracking-[0.14em] text-black transition hover:brightness-110"
+                      >
+                        Adicionar
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleCancelNewPropertyType}
+                        className="min-h-[54px] rounded-2xl border border-[#beaf87]/24 px-5 text-xs font-bold uppercase tracking-[0.14em] text-[#beaf87] transition hover:bg-white/[0.04]"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  )}
+
+                  {form.propertyType === "Outro" && !showNewPropertyType && (
+                    <input
+                      type="text"
+                      value={form.customPropertyType}
+                      onChange={(event) =>
+                        updateField("customPropertyType", event.target.value)
+                      }
+                      placeholder="Escreva o tipo de imóvel. Ex.: Quinta, Duplex, Armazém"
+                      className="field-input"
+                    />
+                  )}
                 </div>
               </FormField>
 
@@ -1762,10 +1922,6 @@ function PropertyEditor({
 
             {activeTab === "caracteristicas" && (
               <CharacteristicsTab form={form} updateField={updateField} />
-            )}
-
-            {activeTab === "credito" && (
-              <CreditTab form={form} updateField={updateField} />
             )}
           </div>
         </div>
@@ -2014,46 +2170,6 @@ Arrecadação`}
           className="field-input min-h-[210px] resize-none py-4 leading-7"
         />
       </FormField>
-    </div>
-  );
-}
-
-function CreditTab({ form, updateField }) {
-  return (
-    <div className="grid gap-5">
-      <SectionTitle title="Simular crédito" />
-
-      <FormField label="Link do botão Simular crédito">
-        <input
-          type="url"
-          value={form.creditSimulationUrl}
-          onChange={(event) =>
-            updateField("creditSimulationUrl", event.target.value)
-          }
-          placeholder="https://..."
-          className="field-input"
-        />
-      </FormField>
-
-      <div className="rounded-2xl border border-[#beaf87]/14 bg-black p-5">
-        <p className="text-sm leading-7 text-white/58">
-          Este link será usado na página pública do imóvel. Quando o visitante
-          clicar em “Simular crédito”, será redirecionado para o endereço
-          configurado aqui.
-        </p>
-
-        {isValidUrl(form.creditSimulationUrl) && (
-          <a
-            href={form.creditSimulationUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-5 inline-flex h-12 items-center justify-center rounded-xl bg-[#beaf87] px-5 text-xs font-extrabold uppercase tracking-[0.14em] text-black"
-          >
-            Testar link
-            <ExternalLink className="ml-2 h-4 w-4" />
-          </a>
-        )}
-      </div>
     </div>
   );
 }

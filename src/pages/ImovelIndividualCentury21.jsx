@@ -704,7 +704,7 @@ function NotFoundState({ errorMessage }) {
 
 function PublicFooter() {
   return (
-    <footer className="border-t border-[#beaf87]/20 bg-[#fbfaf7] px-6 py-12 sm:px-8 lg:px-10">
+      <footer className="border-t border-[#beaf87]/20 bg-[#fbfaf7] px-6 py-12 sm:px-8 lg:px-10">
       <div className="mx-auto grid max-w-7xl gap-10 text-center lg:grid-cols-[1fr_1.2fr_0.8fr] lg:text-left">
         <div>
           <div className="mb-6 flex flex-col items-center gap-1 lg:items-start">
@@ -718,9 +718,29 @@ function PublicFooter() {
             </span>
           </div>
 
-          <h3 className="font-serif text-3xl text-[#2a2418]">Paulo Matos</h3>
-          <p className="mt-1 text-[#171717]/68">Consultor Imobiliário</p>
-          <p className="mt-5 text-lg font-bold text-[#171717]">CENTURY 21.</p>
+          <div className="space-y-5">
+            <div>
+              <h3 className="font-serif text-3xl text-[#2a2418]">
+                Paulo Matos
+              </h3>
+              <p className="mt-1 text-[#171717]/68">
+                Consultor Imobiliário
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-serif text-3xl text-[#2a2418]">
+                Maria Carreiro
+              </h3>
+              <p className="mt-1 text-[#171717]/68">
+                Consultora Imobiliária
+              </p>
+            </div>
+          </div>
+
+          <p className="mt-6 text-lg font-bold text-[#171717]">
+            CENTURY 21.
+          </p>
           <p className="text-[#beaf87]">Nações</p>
         </div>
 
@@ -733,9 +753,18 @@ function PublicFooter() {
               Rua Casquilha 2, 1500-151 Lisboa
             </span>
           </p>
+
+    
         </div>
 
         <div className="flex flex-col items-center gap-4 text-sm text-[#171717]/68 lg:items-end">
+          <a
+            href="/contacte-nos"
+            className="transition hover:text-[#beaf87]"
+          >
+            Contacte-nos
+          </a>
+
           <a
             href="/politica-de-privacidade-e-cookies"
             className="transition hover:text-[#beaf87]"
