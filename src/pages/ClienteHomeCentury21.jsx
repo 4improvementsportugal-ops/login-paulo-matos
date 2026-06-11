@@ -171,7 +171,7 @@ function PropertyCard({ property }) {
         </div>
 
         <p className="mt-4 flex-1 text-sm leading-7 text-[#171717]/62">
-          {property.short_description ||
+          {property.seo_description ||
             "Imóvel disponível para consulta. Fale com a equipa para mais informações."}
         </p>
 
@@ -213,7 +213,7 @@ export default function ClienteHomeCentury21() {
       const { data, error } = await supabase
         .from("properties")
         .select(
-          "id,title,slug,status,consultant,transaction_type,property_type,price,area,bedrooms,bathrooms,parish,city,short_description,photos,cover_photo_url,created_at,updated_at"
+          "id,title,slug,status,consultant,transaction_type,property_type,price,area,bedrooms,bathrooms,parish,city,seo_description,photos,cover_photo_url,created_at,updated_at"
         )
         .eq("status", "publicado")
         .order("updated_at", { ascending: false })
