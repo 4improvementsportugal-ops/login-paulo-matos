@@ -18,13 +18,13 @@ function BrandLogo() {
 export default function CreditoHabitacaoCentury21() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
-  const navItems = [
-    { label: "Sobre Nós", href: "/sobre-nos" },
-    { label: "Apoio Jurídico", href: "/apoio-juridico" },
-    { label: "Crédito Habitação", href: "/credito-habitacao", active: true },
-    { label: "Contacte-nos", href: "/contacte-nos" },
-  ];
-
+ const navItems = [
+  { label: "Início", href: "/" },
+  { label: "Sobre Nós", href: "/sobre-nos" },
+  { label: "Apoio Jurídico", href: "/apoio-juridico" },
+  { label: "Crédito Habitação", href: "/credito-habitacao" },
+  { label: "Contacte-nos", href: "/contacte-nos" },
+];
   return (
     <main className="min-h-screen bg-white text-[#171717]">
       <header className="sticky top-0 z-50 w-full border-b border-[#beaf87]/25 bg-white/94 backdrop-blur-xl">

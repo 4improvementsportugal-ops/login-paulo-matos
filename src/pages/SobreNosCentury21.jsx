@@ -55,12 +55,13 @@ function BrandLogo() {
 export default function SobreNosCentury21() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const navItems = [
-    { label: "Sobre Nós", href: "/sobre-nos", active: true },
-    { label: "Apoio Jurídico", href: "/apoio-juridico" },
-    { label: "Crédito Habitação", href: "/credito-habitacao" },
-    { label: "Contacte-nos", href: "/contacte-nos" },
-  ];
+ const navItems = [
+  { label: "Início", href: "/" },
+  { label: "Sobre Nós", href: "/sobre-nos" },
+  { label: "Apoio Jurídico", href: "/apoio-juridico" },
+  { label: "Crédito Habitação", href: "/credito-habitacao" },
+  { label: "Contacte-nos", href: "/contacte-nos" },
+];
 
   return (
     <main className="min-h-screen bg-white text-[#171717]">

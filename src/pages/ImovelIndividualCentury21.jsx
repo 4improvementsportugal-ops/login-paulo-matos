@@ -430,11 +430,12 @@ export default function ImovelIndividualCentury21() {
 
 function PublicNavbar({ mobileMenuOpen, setMobileMenuOpen }) {
   const navItems = [
-    { label: "Sobre Nós", href: "/sobre-nos" },
-    { label: "Apoio Jurídico", href: "/apoio-juridico" },
-    { label: "Crédito Habitação", href: "/credito-habitacao" },
-    { label: "Contacte-nos", href: "/contacte-nos" },
-  ];
+  { label: "Início", href: "/" },
+  { label: "Sobre Nós", href: "/sobre-nos" },
+  { label: "Apoio Jurídico", href: "/apoio-juridico" },
+  { label: "Crédito Habitação", href: "/credito-habitacao" },
+  { label: "Contacte-nos", href: "/contacte-nos" },
+];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[#beaf87]/25 bg-white/95 backdrop-blur-xl">

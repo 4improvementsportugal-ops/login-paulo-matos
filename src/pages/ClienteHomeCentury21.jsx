@@ -240,11 +240,12 @@ export default function ClienteHomeCentury21() {
   }, [availableProperties]);
 
   const navItems = [
-    { label: "Sobre Nós", href: "/sobre-nos" },
-    { label: "Apoio Jurídico", href: "/apoio-juridico" },
-    { label: "Crédito Habitação", href: "/credito-habitacao" },
-    { label: "Contacte-nos", href: "/contacte-nos" },
-  ];
+  { label: "Início", href: "/" },
+  { label: "Sobre Nós", href: "/sobre-nos" },
+  { label: "Apoio Jurídico", href: "/apoio-juridico" },
+  { label: "Crédito Habitação", href: "/credito-habitacao" },
+  { label: "Contacte-nos", href: "/contacte-nos" },
+];
 
   function handleNavigation(event, href) {
     setMobileMenuOpen(false);

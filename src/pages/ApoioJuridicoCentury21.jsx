@@ -261,12 +261,13 @@ function PublicNavbar({
   setMobileMenuOpen,
   onNavigate,
 }) {
-  const navItems = [
-    { label: "Sobre Nós", href: "/sobre-nos" },
-    { label: "Apoio Jurídico", href: "/apoio-juridico", active: true },
-    { label: "Crédito Habitação", href: "/credito-habitacao" },
-    { label: "Contacte-nos", href: "/contacte-nos" },
-  ];
+const navItems = [
+  { label: "Início", href: "/" },
+  { label: "Sobre Nós", href: "/sobre-nos" },
+  { label: "Apoio Jurídico", href: "/apoio-juridico" },
+  { label: "Crédito Habitação", href: "/credito-habitacao" },
+  { label: "Contacte-nos", href: "/contacte-nos" },
+];
 
   function handleLink(event, item) {
     if (item.href.startsWith("/apoio-juridico")) {

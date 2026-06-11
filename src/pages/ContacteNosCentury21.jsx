@@ -65,12 +65,13 @@ export default function ContacteNosCentury21() {
     }
   }, []);
 
-  const navItems = [
-    { label: "Sobre Nós", href: "/sobre-nos" },
-    { label: "Apoio Jurídico", href: "/apoio-juridico" },
-    { label: "Crédito Habitação", href: "/credito-habitacao" },
-    { label: "Contacte-nos", href: "/contacte-nos", active: true },
-  ];
+ const navItems = [
+  { label: "Início", href: "/" },
+  { label: "Sobre Nós", href: "/sobre-nos" },
+  { label: "Apoio Jurídico", href: "/apoio-juridico" },
+  { label: "Crédito Habitação", href: "/credito-habitacao" },
+  { label: "Contacte-nos", href: "/contacte-nos" },
+];
 
   return (
     <main className="min-h-screen bg-white text-[#171717]">
